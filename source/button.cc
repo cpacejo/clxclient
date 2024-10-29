@@ -204,6 +204,7 @@ void X_tbutton::redraw (void)
 	    if (_style->type & X_button_style::ARIGHT) x = _xs - K.width - 6;
 	    else x = (_xs - K.width) / 2;
 	}
+	if (_down) { x += 1; y += 1; }
         XftDrawStringUtf8 (D, C, F, x, y, (const FcChar8 *) _text1, _len1);
     }
     if (_len2)
@@ -216,6 +217,7 @@ void X_tbutton::redraw (void)
             if (_style->type & X_button_style::ARIGHT) x = _xs - K.width - 6;
 	    else x = (_xs - K.width) / 2;
 	}
+	if (_down) { x += 1; y += 1; }
         XftDrawStringUtf8 (D, C, F, x, y, (const FcChar8 *) _text2, _len2);
     }
     if ((_style->type & 3) == X_button_style::BORDER)

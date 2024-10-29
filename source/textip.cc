@@ -682,8 +682,8 @@ int X_textip::textwidth (int i, int n)
     XGlyphInfo K;
 
     if (n == 0) return 0;
-     XftTextExtentsUtf8 (dpy (), _style->font, (const FcChar8 *)(_txt + i), n, &K);
-     return K.xOff;
+    XftTextExtentsUtf8 (dpy (), _style->font, (const FcChar8 *)(_txt + i), n, &K);
+    return K.xOff;
 }
 
 

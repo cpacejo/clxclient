@@ -127,6 +127,17 @@ void X_mclist::expose (XExposeEvent *E)
 
 void X_mclist::bpress (XButtonEvent *E)
 {
+    switch (E->button)
+    {
+    case Button2:
+	return;
+    case Button4:
+        _callb->handle_callb (X_callback::MCLIST | MB4, this, 0);
+	return;
+    case Button5:
+        _callb->handle_callb (X_callback::MCLIST | MB5, this, 0);
+	return;
+    }
     _sel = find (E->x, E->y);
     if (_sel >= 0)
     {
@@ -304,8 +315,8 @@ void X_mclist::update (int xx, int yy, int ww, int hh)
 	            {
 			XFillRectangle (dpy (), win (), dgc (), x, y, dx, dy); 
   		        C = _style->fg [_col [j] & 3];
-			XftDrawStringUtf8 (D, C, F, x, y + yb, (const FcChar8 *) _ptr [j], _len [j]);
-		    }
+ 			XftDrawStringUtf8 (D, C, F, x, y + yb, (const FcChar8 *) _ptr [j], _len [j]);
+ 	            }
 		}
                 y += dy;
 	    }

@@ -568,7 +568,7 @@ class X_scroll : public X_window, public X_callback
 public:
 
     enum { ENDGAP = 1, PLUSMIN = 2, MIDGAP = 4, ARROWS = 8 };
-    enum { MOVE, STOP, C1LU, C3LU, C1RD, C3RD, B1LU, B3LU, B1RD, B3RD, B1PL, B3PL, B1MI, B3MI };
+    enum { MOVE, STOP, C1LU, C3LU, C1RD, C3RD, B1LU, B3LU, B1RD, B3RD, B1PL, B3PL, B1MI, B3MI, MB4, MB5 };
 
     void redraw (void);
 
@@ -1215,7 +1215,7 @@ class X_mclist : public X_window
 {
 public:
 
-    enum { OPEN, SEL, CAN };
+    enum { OPEN, SEL, CAN, MB4, MB5 };
 
     X_mclist (X_window        *parent,
 	      X_callback      *callb,

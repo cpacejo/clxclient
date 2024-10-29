@@ -148,13 +148,24 @@ void X_scroll::handle_event (XEvent *E)
 
 void X_scroll::bpress (XButtonEvent *E)
 {
-    int k;
+    int b, k;
 
+    b = E->button;
+    switch (b)
+    {
+    case Button2: return;
+    case Button4:
+	 _callb->handle_callb (X_callback::SCROLL | MB4, this, 0);
+	 return;
+    case Button5:
+	 _callb->handle_callb (X_callback::SCROLL | MB5, this, 0);
+	 return;
+    }
     k = (_xs > _ys) ? E->x - 1 : E->y - 1;
     if (! _callb || (k < 0) || (k >= _km))  return; 
     k -= _k0;
-    if   (k >= _dk) _callb->handle_callb (X_callback::SCROLL | ((E->button == Button3) ? C3RD : C1RD), this, 0);
-    else if (k < 0) _callb->handle_callb (X_callback::SCROLL | ((E->button == Button3) ? C3LU : C1LU), this, 0);
+    if   (k >= _dk) _callb->handle_callb (X_callback::SCROLL | (b == Button3 ? C3RD : C1RD), this, 0);
+    else if (k < 0) _callb->handle_callb (X_callback::SCROLL | (b == Button3 ? C3LU : C1LU), this, 0);
     else _zz = k + _k0;
 }
 

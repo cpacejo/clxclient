@@ -43,7 +43,10 @@ int X_scale_style::calcpix (float v)
 	    p0 = p1;
 	    v0 = v1;   
 	}
-	else return (int)(p0 + (p1 - p0) * (v - v0) / (v1 - v0) + 0.5);
+	else
+	{
+	    return (int)(p0 + (p1 - p0) * (v - v0) / (v1 - v0) + 0.5);
+	}
     }
     return p0;
 }

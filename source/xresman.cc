@@ -69,8 +69,8 @@ void X_resman::init (int *argc, char *argv [], char *name,
     if (_home == 0) _home = (char *)"";
 
     // set default name and class
-    strncpy (_rname, name, 64);
-    strncpy (_rclas, name, 64);
+    strncpy (_rname, name, 63);
+    strncpy (_rclas, name, 63);
     _rclas [0] = toupper (_rclas [0]);
 
     // Scan command line args for -name and -class
@@ -78,8 +78,8 @@ void X_resman::init (int *argc, char *argv [], char *name,
     av =  argv;
     while (++av, --ac > 0)
     {
-	if (! strcmp (*av, "-name")  && ac > 1) strncpy (_rname, av [1], 64);
-	if (! strcmp (*av, "-class") && ac > 1) strncpy (_rclas, av [1], 64);
+	if (! strcmp (*av, "-name")  && ac > 1) strncpy (_rname, av [1], 63);
+	if (! strcmp (*av, "-class") && ac > 1) strncpy (_rclas, av [1], 63);
     }
 
     // Initialise X resource manager
