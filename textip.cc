@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -23,7 +23,7 @@
 #include "clxclient.h"
 
 
-#define DX 8
+#define DX 4
 
 
 X_textln::X_textln (X_window          *parent, 
@@ -177,9 +177,10 @@ void X_textip::set_align (int k)
 }
    
 
+
 void X_textip::enable (void)
 {
-    XSetInputFocus (dpy (), win (), RevertToPointerRoot, CurrentTime);
+    XSetInputFocus (dpy (), win (), RevertToParent, CurrentTime);
 }
 
 
@@ -230,6 +231,7 @@ void X_textip::bpress (XButtonEvent *e)
 {
     if (e->button == Button2)
     {
+//	XConvertSelection (dpy (), XA_PRIMARY, XA_STRING, XA_PRIMARY, win (), e->time);
     }
     else
     {
@@ -574,6 +576,7 @@ void X_textip::redraw (void)
     GC gc = disp ()->dgc ();
     XftDraw         *D = xft ();
     XftColor        *C;
+    unsigned long   dark, lite, bgnd;
 
     XSetWindowBackground (dpy (), win (), (_flags & FOCUS) ? _style->color.focus.bgnd : _bg);
     XClearWindow (dpy (), win ());
@@ -588,15 +591,26 @@ void X_textip::redraw (void)
     {
 	XSetLineAttributes (dpy (), gc, 1, LineSolid, CapButt, JoinBevel);
         XSetFunction (dpy (), gc, GXcopy);
-	XSetForeground (dpy (), gc, _style->color.shadow.dark);
-	XDrawLine (dpy (), win (), gc,  0, 0, 0, _ys - 1);
-	XDrawLine (dpy (), win (), gc,  0, 0, _xs - 1, 0);
-	XSetForeground (dpy (), gc, _style->color.shadow.lite);
-	XDrawLine (dpy (), win (), gc, _xs - 1, 1, _xs - 1, _ys);
-	XDrawLine (dpy (), win (), gc, 1, _ys - 1, _xs, _ys - 1);
-	XSetForeground (dpy (), gc, _style->color.shadow.bgnd);
-        XDrawPoint (dpy (), win (), gc, 0, _ys - 1);
-        XDrawPoint (dpy (), win (), gc, _xs - 1, 0);
+	dark = _style->color.shadow.dark;
+	lite = _style->color.shadow.lite;
+	bgnd = _style->color.shadow.bgnd;
+	if (dark == lite)
+	{
+ 	    XSetForeground (dpy (), gc, dark);
+            XDrawRectangle (dpy (), win (), dgc (), 0, 0, _xs - 1, _ys - 1);
+	}
+	else
+	{
+ 	    XSetForeground (dpy (), gc, dark);
+	    XDrawLine (dpy (), win (), gc,  0, 0, 0, _ys - 1);
+	    XDrawLine (dpy (), win (), gc,  0, 0, _xs - 1, 0);
+	    XSetForeground (dpy (), gc, lite);
+	    XDrawLine (dpy (), win (), gc, _xs - 1, 1, _xs - 1, _ys);
+	    XDrawLine (dpy (), win (), gc, 1, _ys - 1, _xs, _ys - 1);
+	    XSetForeground (dpy (), gc, bgnd);
+            XDrawPoint (dpy (), win (), gc, 0, _ys - 1);
+            XDrawPoint (dpy (), win (), gc, _xs - 1, 0);
+	}
     }
     xorcursor ();
 }
@@ -609,6 +623,7 @@ void X_textip::setfocus (XFocusChangeEvent *e)
 	_flags ^= FOCUS;
 	x_add_events (KeyPressMask);
         XSetICValues (_xic, XNFocusWindow, win (), NULL);
+        XSetICFocus (_xic);
 	redraw ();
     }
 }
@@ -620,6 +635,7 @@ void X_textip::remfocus (XFocusChangeEvent *e)
     {  
 	_flags ^= FOCUS;
 	x_rem_events (KeyPressMask);
+        XUnsetICFocus (_xic);
 	redraw ();
     }
 }

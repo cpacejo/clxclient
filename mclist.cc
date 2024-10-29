@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -55,7 +55,7 @@ X_mclist::X_mclist (X_window  *parent, X_callback *callb, X_mclist_style *style,
     _ind = new int [max_item];    
     _dxc = new int [max_item / 4];
     reset ();
-    x_add_events (ExposureMask | ButtonPressMask);
+    x_add_events (ExposureMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask );
 }
 
 
@@ -103,10 +103,18 @@ void X_mclist::handle_event (XEvent *E)
     case GraphicsExpose:
 	expose ((XExposeEvent *) E);
 	break;  
-
     case ButtonPress:
 	bpress ((XButtonEvent *) E);
 	break;  
+    case EnterNotify:
+	enter ((XEnterWindowEvent *) E);
+	break;
+    case LeaveNotify:
+	leave ((XLeaveWindowEvent *) E);
+	break;
+    case MotionNotify:
+	motion ((XPointerMovedEvent *) E);
+	break;
     }
 }
 
@@ -119,26 +127,48 @@ void X_mclist::expose (XExposeEvent *E)
 
 void X_mclist::bpress (XButtonEvent *E)
 {
-    int d, x, y, r, c;
+    _sel = find (E->x, E->y);
+    if (_sel >= 0)
+    {
+        _callb->handle_callb (X_callback::MCLIST | SEL, this, (XEvent *) E);
+    }
+}
 
-    if (! _nclm) return;
-    x = E->x - X0 + _offs;
-    y = E->y;
+
+void X_mclist::enter (XEnterWindowEvent * E)
+{
+    hilite (find (E->x, E->y));
+}
+
+
+void X_mclist::leave (XLeaveWindowEvent * E)
+{
+    hilite (-1);}
+
+
+void X_mclist::motion (XPointerMovedEvent * E)
+{
+    hilite (find (E->x, E->y));
+}
+
+
+int X_mclist::find (int x, int y)
+{
+    int c, d, k, r;
+
+    if (! _nclm) return -1;
+    x += _offs - X0;
     d = _style->dy;
     r = y / d;
     y -= r * d;
-    if ((y < 2) || (y > d - 2)) return;
-    for (c = 0; c < _nclm; c++)
+    if ((y < 2) || (y > d - 2)) return -1;
+    for (c = 0, k = r; k < _n_item; c++, k += _nrow)
     {
         d = _dxc [c];
-	if ((x > 0) && (x < d))
-	{
-	    _sel = _ind [c * _nrow + r]; 
-            if (_sel < _n_item) _callb->handle_callb (X_callback::MCLIST | SEL, this, (XEvent *) E);    
-            return;
-	}
+	if ((x > 0) && (x < d)) return _ind [k];
         x -= d + DX;
     }
+    return -1;
 }
 
 
@@ -219,6 +249,22 @@ void X_mclist::move (int offs)
     G.graphics_exposures = False;
     XChangeGC (dpy (), dgc (), GCGraphicsExposures, &G);
     _offs = offs;
+}
+
+
+void X_mclist::hilite (int ind)
+{
+    if (_sel != ind)
+    {
+	if (_sel >= 0) drawhl (_sel);
+	_sel = ind;
+	if (_sel >= 0) drawhl (_sel);
+    }
+}
+
+
+void X_mclist::drawhl (int ind)
+{
 }
 
 

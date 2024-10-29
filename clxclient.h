@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -92,8 +92,8 @@ private:
     XftDraw     *_xft;
     XIM          _xim;
 
-    static char  _imgdef1515 [N_IMG1515 * 30];
-    XImage      *_imgptr1515 [N_IMG1515];
+    static unsigned char  _imgdef1515 [N_IMG1515 * 30];
+    XImage               *_imgptr1515 [N_IMG1515];
 };
 
 
@@ -221,6 +221,9 @@ public:
     bool check_done (void) const { return _list == 0; }
 
 private:
+
+    Window    _window;
+    X_window *_object;
 };
 
 
@@ -324,8 +327,7 @@ public:
     void setcolor (unsigned long c) { _xft_color = 0;  XSetForeground (_dpy, _gct, c); }
     void setcolor (XftColor     *c) { _xft_color = c;  XSetForeground (_dpy, _gct, c->pixel); }
     void setfunc (int f) { XSetFunction (_dpy, _gct, f); }
-    void setline (int d) { XSetLineAttributes (_dpy, _gct, d, LineSolid, CapButt, JoinBevel); } 
-    void setline (int d, int m) { XSetLineAttributes (_dpy, _gct, d, m, CapButt, JoinBevel); } 
+    void setline (int d, int f = LineSolid, int c = CapButt, int j = JoinBevel) { XSetLineAttributes (_dpy, _gct, d, f, c, j); } 
     void setdash (char *v, int n, int i = 0) { XSetDashes (_dpy, _gct, i, v, n); }
     void move (int x, int y) { _xx = x; _yy = y; }
     void rmove (int x, int y) { _xx += x; _yy += y; }
@@ -404,7 +406,7 @@ class X_button_style
 {
 public:
 
-    enum { PLAIN = 0, BORDER = 1, RAISED = 2, ALEFT = 4, ARIGHT = 8 };
+    enum { PLAIN = 0, BORDER = 1, RAISED = 2, ALEFT = 4, ARIGHT = 8, HOLDPTR = 16 };
 
     XftFont *font;
     struct 
@@ -1227,7 +1229,7 @@ public:
 
     ~X_mclist (void);
 
-    void reset (void) { _n_item = _n_char = 0; _sel = 0; }
+    void reset (void) { _n_item = _n_char = 0; _sel = -1; }
     int  item (const char *txt, int col, int len = 0);  
     void sort (void);
     void show (void);
@@ -1250,6 +1252,12 @@ private:
     void expose (XExposeEvent *E);
     void bpress (XButtonEvent *E);
     void update (int xx, int yy, int ww, int hh);
+    int  find (int x, int y);
+    void enter (XEnterWindowEvent * E);
+    void leave (XLeaveWindowEvent * E);
+    void motion (XPointerMovedEvent * E);
+    void hilite (int ind);
+    void drawhl (int ind);
 
     X_mclist_style  *_style;
     X_callback      *_callb;

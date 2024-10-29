@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published

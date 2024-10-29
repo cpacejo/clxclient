@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -42,7 +42,7 @@ X_display::X_display (const char *name) :
 
     for (i = 0; i < N_IMG1515; i++)
     {
-	I = XCreateImage (_dpy, _dvi, 1, XYBitmap, 0, _imgdef1515 + 30 * i, 15, 15, 8, 2);
+	I = XCreateImage (_dpy, _dvi, 1, XYBitmap, 0, (char *) _imgdef1515 + 30 * i, 15, 15, 8, 2);
 	I->bitmap_unit = 8;
 	I->bitmap_pad  = 8;
 	I->bitmap_bit_order = LSBFirst;
@@ -56,12 +56,14 @@ X_display::~X_display (void)
 {
     int i;
 
+    if (!_dpy) return;
     for (i = 0; i < N_IMG1515; i++)
     {  
         _imgptr1515 [i]->data = 0;
         XDestroyImage (_imgptr1515 [i]);
     }
-    if (_dpy) XCloseDisplay (_dpy); 
+    if (_xim) XCloseIM (_xim);
+    XCloseDisplay (_dpy); 
 }
 
 
@@ -179,7 +181,7 @@ XImage *X_display::image1515 (unsigned int i)
 }
 
 
-char X_display::_imgdef1515 [N_IMG1515 * 30] =
+unsigned char X_display::_imgdef1515 [N_IMG1515 * 30] =
 {
     0,0,0,0,0,0,0,2,0,3,128,3,192,3,224,3,192,3,128,3,0,3,0,2,0,0,0,0,0,0, 
     0,0,0,0,0,0,32,0,96,0,224,0,224,1,224,3,224,1,224,0,96,0,32,0,0,0,0,0,0,0,

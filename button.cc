@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -97,6 +97,7 @@ void X_button::expose (XExposeEvent *E)
 
 void X_button::release (void)
 {
+    if (_style->type & X_button_style::HOLDPTR) return;
     XUngrabPointer (dpy (), CurrentTime);
     _down = 0;
     redraw ();
@@ -185,7 +186,7 @@ void X_tbutton::redraw (void)
     XSetFunction (dpy (), G, GXcopy);
     b = (_stat > 3) ? _bg : _style->color.bg [_stat];
     XSetForeground (dpy (), G, b);
-    XFillRectangle (dpy (), win (), G, 0, 0, _xs - 1, _ys - 1);
+    XFillRectangle (dpy (), win (), G, 0, 0, _xs, _ys);
 
     a = F->ascent;
     d = F->descent;

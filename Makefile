@@ -1,4 +1,6 @@
-#  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+# ---------------------------------------------------------------------------------
+#
+#  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU Lesser General Public License as published
@@ -13,6 +15,8 @@
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# ---------------------------------------------------------------------------------
 
 
 # Modify as required.
@@ -23,13 +27,12 @@ LIBDIR = lib$(SUFFIX)
 
 
 MAJVERS = 3
-MINVERS = 6.1
+MINVERS = 9.0
 VERSION = $(MAJVERS).$(MINVERS)
-DISTDIR = clxclient-$(VERSION)
 
 
 CPPFLAGS += -Wall -I. -I/usr/X11R6/include `freetype-config --cflags` -fpic -DVERSION=\"$(VERSION)\" -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -O2 
-LDFLAGS += -L$(PREFIX)/$(LIBDIR) -L/usr/X11R6/$(LIBDIR) `freetype-config --libs`
+LDFLAGS += -L/usr/X11R6/$(LIBDIR) `freetype-config --libs`
 LDLIBS +=
 
 
@@ -47,22 +50,13 @@ $(CLXCLIENT_MIN): $(CLXCLIENT_O)
 
 
 install:	$(CLXCLIENT_MIN)
-	/usr/bin/install -d $(PREFIX)/$(LIBDIR)
-	/usr/bin/install -m 644 $(CLXCLIENT_H) $(PREFIX)/include
-	/usr/bin/install -m 755 $(CLXCLIENT_MIN) $(PREFIX)/$(LIBDIR)
-	/sbin/ldconfig -n $(PREFIX)/$(LIBDIR)
+	install -d $(PREFIX)/$(LIBDIR)
+	install -m 644 $(CLXCLIENT_H) $(PREFIX)/include
+	install -m 755 $(CLXCLIENT_MIN) $(PREFIX)/$(LIBDIR)
+	ldconfig
 	ln -sf $(CLXCLIENT_MIN) $(PREFIX)/$(LIBDIR)/$(CLXCLIENT_SO)
 
 
 clean:
 	/bin/rm -f *~ *.o *.a *.d *.so.*
-
-
-tarball:
-	cd ..; \
-	/bin/rm -f -r $(DISTDIR)*; \
-	svn export clxclient $(DISTDIR); \
-	tar cvf $(DISTDIR).tar $(DISTDIR); \
-	bzip2 $(DISTDIR).tar; \
-	/bin/rm -f -r $(DISTDIR);
 

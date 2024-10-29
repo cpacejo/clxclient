@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -122,35 +122,6 @@ X_window::~X_window (void)
 }
 		  
 
-/*
-X_window::~X_window (void)
-{
-    X_window *T;
-
-    if (_pwin)
-    {
-        T = _pwin->_list;
-        if (T == this) _pwin->_list = _next;
-        else
-	{
-	    while (T && T->_next != this) T = T->_next;
-            if (T) T->_next = _next;
-	}
-        if (_wind)
-	{
-            XDestroyWindow (_disp->_dpy, _wind);
-            XFlush (_disp->_dpy);
-	}
-    }
-    while (_list)
-    {
-        if (_pwin) _list->_wind = 0;
-        delete _list; 
-    }
-}
-*/
-
-
 X_window *X_window::find (Window w)
 {
     X_window *T, *W;
@@ -241,7 +212,8 @@ void X_window::x_apply (X_hints *hints)
 
 
 X_rootwin::X_rootwin (X_display *disp) :
-    X_window (disp)
+    X_window (disp),
+    _object (0)
 {
     _disp->_xft = XftDrawCreate (_disp->_dpy, _wind, _disp->_dvi, _disp->_dcm);
 }
@@ -251,19 +223,6 @@ X_rootwin::~X_rootwin (void)
 {
 //    if (_disp->_xft) XftDrawDestroy (_disp->_xft);
 }
-
-/*
-void X_rootwin::handle_event (void)
-{
-    XEvent E;
-    while (   XCheckMaskEvent (_disp->_dpy, ~0L, &E)
-	   || XCheckTypedEvent (_disp->_dpy, SelectionNotify, &E)
-	   || XCheckTypedEvent (_disp->_dpy, ClientMessage, &E))
-    {
-	handle_event (&E);
-    }
-}
-*/
 
 
 static Bool check_event (Display *dpy, XEvent *ev, char *arg)
@@ -284,10 +243,25 @@ void X_rootwin::handle_event (void)
 
 void X_rootwin::handle_event (XEvent *E)
 {
-    X_window *W;
+    X_window   *W;
+    Window      k; 
   
-    W = find (((XAnyEvent *) E)->window);
-    if (W && W != this) W->handle_event (E);
+    k = ((XAnyEvent *) E)->window;
+//    if (XFilterEvent (E, k)) return;
+    if (_object && _window == k)
+    {
+        _object->handle_event (E); 
+    }
+    else
+    {
+        W = find (k);
+        if (W && W != this)
+	{
+            W->handle_event (E);
+	    _window = k;
+	    _object = W;
+	}
+    }
     XFlush (_disp->_dpy);
 }
 

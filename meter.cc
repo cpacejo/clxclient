@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------
 //
-//  Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
+//  Copyright (C) 2003-2013 Fons Adriaensen <fons@linuxaudio.org>
 //    
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU Lesser General Public License as published
@@ -173,7 +173,7 @@ void X_vmeter::psect (GC g, int a, int b)
 
 void X_vmeter::pmark (GC g, int a)
 {
-    XDrawLine (dpy (), win (), g, _x + 1, _y - a, _x + _d, _y - a);
+    XDrawLine (dpy (), win (), g, _x, _y - a, _x + _d, _y - a);
 }
 
 
