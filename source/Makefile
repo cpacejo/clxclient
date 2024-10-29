@@ -24,13 +24,14 @@ SUFFIX := $(shell uname -m | sed -e 's/^unknown/$//' -e 's/^i.86/$//' -e 's/^x86
 PREFIX ?= /usr/local
 INCDIR ?= $(PREFIX)/include
 LIBDIR ?= $(PREFIX)/lib$(SUFFIX)
+PKG_CONF ?= pkgconf
 
 MAJVERS = 3
 MINVERS = 9.2
 VERSION = $(MAJVERS).$(MINVERS)
 
 
-CPPFLAGS += $(shell pkgconf --cflags freetype2) 
+CPPFLAGS += $(shell $(PKG_CONF) --cflags freetype2) 
 CPPFLAGS += -DVERSION=\"$(VERSION)\" -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS $(PCONFCFL)
 CXXFLAGS += -Wall -O2 -fPIC 
 LDLIBS +=
