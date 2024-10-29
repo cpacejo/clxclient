@@ -33,14 +33,13 @@ VERSION = $(MAJVERS).$(MINVERS)
 CPPFLAGS += $(shell pkgconf --cflags freetype2) 
 CPPFLAGS += -DVERSION=\"$(VERSION)\" -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS $(PCONFCFL)
 CXXFLAGS += -Wall -O2 -fPIC 
-CXXFLAGS += -march=native
 LDLIBS +=
 
 
 CLXCLIENT_SO = libclxclient.so
 CLXCLIENT_MAJ = $(CLXCLIENT_SO).$(MAJVERS)
 CLXCLIENT_MIN = $(CLXCLIENT_MAJ).$(MINVERS)
-CLXCLIENT_DEP = -lpthread -lXft -lX11
+CLXCLIENT_DEP = -lpthread -lXft -lX11 -lclthreads
 CLXCLIENT_O = xdisplay.o xresman.o xhandler.o xwindow.o xdraw.o \
 	button.o textip.o enumip.o menuwin.o scale.o slider.o scroll.o mclist.o meter.o
 CLXCLIENT_H = clxclient.h
@@ -52,15 +51,15 @@ $(CLXCLIENT_MIN): $(CLXCLIENT_O)
 
 install:	$(CLXCLIENT_MIN)
 	install -d $(DESTDIR)$(INCDIR)
-	install -d $(DESTDIR)$(LIBDIR)
+	install -d $(DESTDIR)$(PREFIX)/$(LIBDIR)
 	install -m 644 $(CLXCLIENT_H) $(DESTDIR)$(INCDIR)
-	install -m 755 $(CLXCLIENT_MIN) $(DESTDIR)$(LIBDIR)
-	ldconfig
-	ln -sf $(CLXCLIENT_MIN) $(DESTDIR)$(LIBDIR)/$(CLXCLIENT_SO)
+	install -m 755 $(CLXCLIENT_MIN) $(DESTDIR)$(PREFIX)/$(LIBDIR)
+	/sbin/ldconfig -n $(DESTDIR)$(PREFIX)/$(LIBDIR)
+	ln -sf $(CLXCLIENT_MIN) $(DESTDIR)$(PREFIX)/$(LIBDIR)/$(CLXCLIENT_SO)
 
 uninstall:
 	rm -rf $(DESTDIR)$(INCDIR)/$(CLXCLIENT_H)
-	rm -rf $(DESTDIR)$(LIBDIR)/libclxclient*
+	rm -rf $(DESTDIR)$(PREFIX)/$(LIBDIR)/libclxclient*
 
 clean:
 	/bin/rm -f *~ *.o *.a *.d *.so.*
